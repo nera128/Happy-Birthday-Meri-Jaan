@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For Neha 🌸</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lora:ital,wght@0,400;1,400&family=Caveat:wght@400;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --cream: #fdf0f2; --warm: #f8e8ec; --blush: #fce4ea;
+      --dusty-rose: #c97d90; --rose: #c23558; --deep-rose: #962645;
+      --gold: #b89a6a; --brown: #1c3a6e; --ink: #1a2d52;
+      --light-ink: #2c4270; --muted: #6070a0; --white: #fff8f9;
+      --shadow: rgba(194,53,88,0.14); --shadow-deep: rgba(194,53,88,0.26);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--cream); color: var(--ink); font-family: 'Lora', Georgia, serif; overflow-x: hidden; }
+    .hidden { display: none !important; }
+
+    /* ── LOCK SCREEN ── */
+    #lock-screen {
+      position: fixed; inset: 0;
+      background: linear-gradient(145deg, #fdf0f2 0%, #f5d8e0 50%, #f0d0dc 100%);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.9s cubic-bezier(0.4,0,0.2,1), transform 0.9s cubic-bezier(0.4,0,0.2,1);
+    }
+    #lock-screen.fade-out { opacity: 0; transform: scale(1.05); pointer-events: none; }
+    #lock-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+    #confetti-wrap { position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 10; }
+    .lock-inner { text-align: center; z-index: 2; position: relative; animation: lock-enter 0.8s cubic-bezier(0.34,1.56,0.64,1) both; }
+    @keyframes lock-enter { from { opacity:0; transform:translateY(20px) scale(0.96); } to { opacity:1; transform:translateY(0) scale(1); } }
+
+    .lock-deco { font-size: 1.8rem; color: var(--gold); letter-spacing: 0.5em; margin-bottom: 1.2rem; animation: shimmer 3s ease-in-out infinite; }
+    @keyframes shimmer { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.5;transform:scale(0.97);} }
+
+    .lock-title { font-family: 'Playfair Display', serif; font-size: clamp(3rem,8vw,5.5rem); color: var(--rose); line-height: 1.1; margin-bottom: 0.5rem; animation: heartbeat 2.4s ease-in-out infinite; }
+    @keyframes heartbeat { 0%,100%{transform:scale(1);} 14%{transform:scale(1.03);} 28%{transform:scale(1);} 42%{transform:scale(1.015);} 70%{transform:scale(1);} }
+
+    .lock-sub { font-family: 'Caveat', cursive; font-size: 1.25rem; color: var(--light-ink); margin-bottom: 2.5rem; }
+
+    .code-dots { display: flex; gap: 0.9rem; justify-content: center; margin-bottom: 2rem; }
+    .code-dots span {
+      width: 16px; height: 16px; border-radius: 50%;
+      border: 2px solid rgba(44,66,112,0.35); background: transparent;
+      transition: background 0.2s, transform 0.25s cubic-bezier(0.34,1.56,0.64,1), border-color 0.2s;
+    }
+    .code-dots span.filled { background: var(--rose); border-color: var(--rose); transform: scale(1.2); }
+    .code-dots span.error { background: #e05555; border-color: #e05555; animation: shake 0.45s ease; }
+    @keyframes shake { 0%,100%{transform:translateX(0);} 20%{transform:translateX(-8px);} 40%{transform:translateX(8px);} 60%{transform:translateX(-5px);} 80%{transform:translateX(5px);} }
+
+    .numpad { display: grid; grid-template-columns: repeat(3, 72px); gap: 13px; justify-content: center; margin-bottom: 1.2rem; }
+    .num {
+      width: 72px; height: 72px; border-radius: 50%;
+      border: 1.5px solid rgba(44,66,112,0.3);
+      background: rgba(255,255,255,0.6); backdrop-filter: blur(8px);
+      font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--ink);
+      cursor: pointer; user-select: none;
+      transition: background 0.15s, transform 0.1s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.15s;
+      box-shadow: 0 2px 10px var(--shadow);
+    }
+    .num:hover { background: rgba(255,255,255,0.9); transform: scale(1.08); box-shadow: 0 5px 18px var(--shadow-deep); }
+    .num:active { transform: scale(0.93); }
+    .num.clear { font-size: 1rem; color: var(--light-ink); border-color: rgba(44,66,112,0.25); }
+    .num.enter { font-size: 1.1rem; background: linear-gradient(135deg,var(--rose),var(--deep-rose)); color: white; border-color: transparent; box-shadow: 0 4px 16px rgba(194,53,88,0.4); }
+    .num.enter:hover { transform: scale(1.1); box-shadow: 0 6px 22px rgba(194,53,88,0.5); }
+
+    .lock-hint { font-family: 'Caveat', cursive; font-size: 1rem; color: #c23558; min-height: 1.4em; }
+
+    .confetti-piece { position: absolute; top: -20px; width: 9px; height: 9px; opacity: 0; border-radius: 2px; animation: cffall linear forwards; }
+    @keyframes cffall { 0%{transform:translateY(0) rotate(0deg);opacity:1;} 90%{opacity:1;} 100%{transform:translateY(110vh) rotate(720deg);opacity:0;} }
+
+    /* ── PROGRESS RIBBON ── */
+    .progress-ribbon {
+      position: fixed; right: 1.4rem; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column; align-items: center;
+      z-index: 200; width: 3px; height: 160px;
+      background: rgba(44,66,112,0.15); border-radius: 2px;
+    }
+    .ribbon-fill { position: absolute; top: 0; left: 0; right: 0; background: var(--light-ink); border-radius: 2px; height: 0%; transition: height 0.3s ease; }
+    .ribbon-dots { position: absolute; top: 0; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; height: 100%; justify-content: space-between; }
+    .rdot {
+      width: 9px; height: 9px; border-radius: 50%;
+      border: 1.5px solid var(--light-ink); background: var(--cream);
+      margin-left: -4px; cursor: pointer;
+      transition: background 0.3s, border-color 0.3s, transform 0.3s;
+    }
+    .rdot.active { background: var(--light-ink); border-color: var(--ink); transform: scale(1.45); }
+    @media (max-width: 600px) { .progress-ribbon { display: none; } }
+
+    /* ── MUSIC PLAYER ── */
+    .music-player {
+      position: fixed; bottom: 1.4rem; left: 1.4rem;
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(253,240,242,0.94); backdrop-filter: blur(14px);
+      border: 1px solid rgba(44,66,112,0.18); border-radius: 50px;
+      padding: 8px 16px 8px 10px; z-index: 200;
+      box-shadow: 0 4px 24px rgba(194,53,88,0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .music-player:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(194,53,88,0.16); }
+
+    .music-vinyl {
+      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+      background: conic-gradient(#962645 0deg 40deg,#c23558 40deg 80deg,#962645 80deg 120deg,#c23558 120deg 160deg,#962645 160deg 200deg,#c23558 200deg 240deg,#962645 240deg 280deg,#c23558 280deg 320deg,#962645 320deg 360deg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .music-vinyl.spinning { animation: spin 3s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .vinyl-inner { width: 12px; height: 12px; border-radius: 50%; background: var(--light-ink); border: 2px solid var(--cream); }
+
+    .music-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+    .song-name { font-family: 'Caveat', cursive; font-size: 0.95rem; color: var(--brown); max-width: 140px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+    .music-hint { font-family: 'Caveat', cursive; font-size: 0.7rem; color: var(--muted); }
+
+    .music-controls { display: flex; gap: 4px; align-items: center; }
+    .mc-btn { background: none; border: none; color: var(--light-ink); font-size: 0.85rem; cursor: pointer; padding: 5px 6px; border-radius: 50%; transition: background 0.15s, transform 0.1s, color 0.15s; line-height: 1; }
+    .mc-btn:hover { background: rgba(44,66,112,0.1); color: var(--ink); transform: scale(1.12); }
+    .mc-btn.play-pause { font-size: 1.05rem; background: rgba(44,66,112,0.08); }
+    .mc-btn.play-pause:hover { background: rgba(44,66,112,0.16); }
+
+    /* ── Music toggle ── */
+    .music-toggle-btn {
+      background: none; border: none;
+      color: var(--muted); font-size: 0.8rem;
+      cursor: pointer; padding: 4px 5px;
+      border-radius: 50%; line-height: 1; flex-shrink: 0;
+      transition: color 0.2s, transform 0.35s cubic-bezier(0.34,1.2,0.64,1);
+    }
+    .music-toggle-btn:hover { color: var(--ink); }
+    .music-player.collapsed .music-info,
+    .music-player.collapsed .music-controls { display: none; }
+    .music-player.collapsed { padding: 8px 10px; }
+    .music-player.collapsed .music-toggle-btn { transform: rotate(180deg); }
+
+    /* ── PAGES ── */
+    #scrapbook { position: relative; }
+    .page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 5rem 2rem; position: relative; overflow: hidden; }
+
+    .fade-section, .slide-from-left, .slide-from-right, .slide-from-bottom {
+      opacity: 0; transition: opacity 0.85s ease, transform 0.85s cubic-bezier(0.22,1,0.36,1);
+    }
+    .fade-section { transform: translateY(30px); }
+    .slide-from-left  { transform: translateX(-50px); }
+    .slide-from-right { transform: translateX(50px); }
+    .slide-from-bottom { transform: translateY(60px); }
+    .fade-section.visible, .slide-from-left.visible, .slide-from-right.visible, .slide-from-bottom.visible { opacity: 1; transform: translate(0); }
+    .memory-text.visible { transition-delay: 0.12s; }
+
+    /* ── Cover ── */
+    .cover-page { background: linear-gradient(155deg,#fdf0f2 0%,#f5dde5 55%,#f0d5e8 100%); flex-direction: column; }
+    #cover-canvas { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+    .cover-inner { position: relative; z-index: 1; text-align: center; }
+    .cover-stamp { font-size: 1rem; color: var(--gold); letter-spacing: 0.6em; margin-bottom: 1.4rem; }
+    .cover-title { font-family: 'Playfair Display', serif; font-size: clamp(4rem,11vw,9rem); color: var(--rose); line-height: 1.02; margin-bottom: 0.3rem; letter-spacing: -0.02em; }
+    .title-line { display: block; }
+    .title-sub { display: block; font-style: italic; font-size: 0.52em; color: var(--brown); margin-top: 0.1em; }
+    .cover-tagline { font-family: 'Caveat', cursive; font-size: 1.6rem; color: var(--light-ink); margin: 1.2rem 0 1.5rem; }
+    .cover-divider { width: 60px; height: 1.5px; background: linear-gradient(90deg,transparent,var(--gold),transparent); margin: 0 auto 1rem; }
+    .cover-date { font-family: 'Caveat', cursive; font-size: 1rem; color: var(--muted); letter-spacing: 0.05em; margin-bottom: 3rem; }
+    .scroll-hint { font-family: 'Caveat', cursive; font-size: 1rem; color: var(--light-ink); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .scroll-arrow { animation: float-down 1.8s ease-in-out infinite; }
+    @keyframes float-down { 0%,100%{transform:translateY(0);} 50%{transform:translateY(8px);} }
+
+    /* ── Washi tape ── */
+    .page-tape { position: absolute; width: 80px; height: 22px; background: repeating-linear-gradient(-45deg,rgba(44,66,112,0.2) 0,rgba(44,66,112,0.2) 6px,rgba(253,240,242,0.65) 6px,rgba(253,240,242,0.65) 12px); border-radius: 2px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+    .tape-tl { top: 2rem; left: 2rem; transform: rotate(-10deg); }
+    .tape-tr { top: 2rem; right: 2rem; transform: rotate(10deg); }
+    .tape-bl { bottom: 2rem; left: 2rem; transform: rotate(5deg); }
+    .tape-br { bottom: 2rem; right: 2rem; transform: rotate(-5deg); }
+
+    /* ── Memory pages ── */
+    .memory-page { background: var(--white); }
+    .memory-page.alt-bg { background: var(--warm); }
+    .memory-inner { display: flex; align-items: center; gap: clamp(2.5rem,6vw,5rem); max-width: 980px; width: 100%; flex-wrap: wrap; justify-content: center; }
+    .memory-inner.reverse { flex-direction: row-reverse; }
+
+    .memory-photo-wrap { position: relative; flex-shrink: 0; }
+    .polaroid { background: white; padding: 14px 14px 52px; box-shadow: 3px 3px 0 rgba(194,53,88,0.06), 6px 8px 24px rgba(194,53,88,0.14); width: clamp(250px, 45vw, 400px); transition: transform 0.35s cubic-bezier(0.34,1.2,0.64,1), box-shadow 0.35s; }
+    .polaroid img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #fde8ec; }
+    .polaroid-caption { font-family: 'Caveat', cursive; font-size: 1.05rem; color: var(--light-ink); text-align: center; position: absolute; bottom: 14px; left: 0; right: 0; }
+    .tilt-right { transform: rotate(2.8deg); }
+    .tilt-left  { transform: rotate(-2.8deg); }
+    .polaroid:hover { transform: rotate(0deg) scale(1.03) !important; box-shadow: 6px 12px 36px rgba(194,53,88,0.2); }
+
+    .polaroid-sticker { position: absolute; bottom: -10px; left: -14px; font-size: 1.6rem; animation: sway 3s ease-in-out infinite; z-index: 2; }
+    .polaroid-sticker.sticker-right { left: auto; right: -14px; }
+    @keyframes sway { 0%,100%{transform:rotate(-8deg);} 50%{transform:rotate(8deg);} }
+
+    .memory-text { max-width: 380px; flex: 1; min-width: 220px; }
+    .memory-number { font-family: 'Playfair Display', serif; font-size: 4rem; color: rgba(194,53,88,0.14); display: block; line-height: 1; margin-bottom: 0.1rem; }
+    .memory-title { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem,4vw,2.3rem); color: var(--rose); margin-bottom: 1rem; line-height: 1.2; }
+    .memory-story { font-family: 'Lora', serif; font-size: 1rem; line-height: 1.9; color: var(--light-ink); margin-bottom: 1.3rem; }
+    .memory-date { font-family: 'Caveat', cursive; font-size: 1rem; color: var(--light-ink); letter-spacing: 0.04em; }
+
+    /* ── Letter page ── */
+    .letter-page { background: linear-gradient(150deg,#fdf0f2 0%,#f5d8e4 100%); flex-direction: column; }
+    .letter-envelope { position: relative; max-width: 640px; width: 100%; background: var(--white); border-radius: 4px; box-shadow: 0 8px 48px rgba(194,53,88,0.13), 0 2px 8px rgba(194,53,88,0.08); }
+    .envelope-flap { position: absolute; top: -1px; left: 0; right: 0; height: 40px; background: linear-gradient(160deg,#f0c8d4 0%,#e8c0d0 100%); clip-path: polygon(0 0, 100% 0, 50% 100%); border-radius: 4px 4px 0 0; }
+    .letter-inner { padding: 3.5rem 3rem 3rem; border: 1px solid rgba(44,66,112,0.12); border-radius: 4px; }
+    .letter-seal { font-size: 2.8rem; text-align: center; display: block; margin-bottom: 1.2rem; animation: pulse-seal 2.5s ease-in-out infinite; }
+    @keyframes pulse-seal { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
+    .letter-title { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,4.5vw,2.8rem); color: var(--rose); text-align: center; margin-bottom: 1.2rem; }
+    .letter-rule { width: 80px; height: 1px; background: linear-gradient(90deg,transparent,var(--light-ink),transparent); margin: 0 auto 2rem; }
+    .letter-body { font-family: 'Lora', serif; font-size: 1.05rem; line-height: 2.1; color: var(--light-ink); }
+    .letter-body em { font-style: italic; color: var(--rose); font-size: 1.1em; }
+
+    .final-petals { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .fpetal { position: absolute; font-size: 1.4rem; opacity: 0; animation: fp-fall linear infinite; }
+    @keyframes fp-fall { 0%{transform:translateY(-40px) rotate(0deg);opacity:0.8;} 100%{transform:translateY(110vh) rotate(540deg);opacity:0;} }
+
+    body::after { content:''; position:fixed; inset:0; pointer-events:none; z-index:9998; opacity:0.018; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)'/%3E%3C/svg%3E"); }
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: var(--cream); }
+    ::-webkit-scrollbar-thumb { background: var(--dusty-rose); border-radius: 3px; }
+
+    @media (max-width: 680px) { .memory-inner, .memory-inner.reverse { flex-direction: column; } }
+    @media (max-width: 500px) {
+      .music-player { bottom: 0.8rem; left: 0.8rem; padding: 6px 12px 6px 8px; }
+      .music-hint { display: none; }
+      .letter-inner { padding: 2.5rem 1.5rem 2rem; }
+      .page { padding: 4rem 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════
+  🔐 LOCK SCREEN
+══════════════════════════════════════════════════ -->
+<div id="lock-screen">
+  <canvas id="lock-canvas"></canvas>
+  <div id="confetti-wrap"></div>
+  <div class="lock-inner">
+    <div class="lock-deco">✦</div>
+    <h1 class="lock-title">For Neha</h1>
+    <p class="lock-sub">Enter the secret code, my love 🌸</p>
+    <div class="code-dots" id="code-dots">
+      <!-- dots generated by JS based on pin length -->
+    </div>
+    <div class="numpad">
+      <button class="num" data-n="1">1</button>
+      <button class="num" data-n="2">2</button>
+      <button class="num" data-n="3">3</button>
+      <button class="num" data-n="4">4</button>
+      <button class="num" data-n="5">5</button>
+      <button class="num" data-n="6">6</button>
+      <button class="num" data-n="7">7</button>
+      <button class="num" data-n="8">8</button>
+      <button class="num" data-n="9">9</button>
+      <button class="num clear" data-n="clear">✕</button>
+      <button class="num" data-n="0">0</button>
+      <button class="num enter" data-n="enter">↵</button>
+    </div>
+    <p class="lock-hint" id="lock-hint"></p>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+  📖 SCRAPBOOK
+══════════════════════════════════════════════════ -->
+<div id="scrapbook" class="hidden">
+
+  <!-- Progress ribbon -->
+  <div class="progress-ribbon" id="progress-ribbon">
+    <div class="ribbon-fill" id="ribbon-fill"></div>
+    <div class="ribbon-dots" id="ribbon-dots"></div>
+  </div>
+
+  <!-- Music player -->
+  <div class="music-player" id="music-player">
+    <div class="music-vinyl" id="music-vinyl">
+      <div class="vinyl-inner"></div>
+    </div>
+    <div class="music-info">
+      <span class="song-name" id="song-name">Our Playlist</span>
+      <span class="music-hint" id="music-hint">press ▶ to play</span>
+    </div>
+    <div class="music-controls">
+      <button class="mc-btn" id="prev-btn" title="Previous">&#9664;&#9664;</button>
+      <button class="mc-btn play-pause" id="play-btn" title="Play / Pause (Space)">&#9654;</button>
+      <button class="mc-btn" id="next-btn" title="Next">&#9654;&#9654;</button>
+    </div>
+    <audio id="audio-player" preload="none"></audio>
+    <button class="music-toggle-btn" id="music-toggle-btn" title="Hide player">▾</button>
+  </div>
+
+  <!-- ══ COVER ══ -->
+  <section class="page cover-page" id="page-cover" data-page="0">
+    <canvas id="cover-canvas"></canvas>
+    <div class="cover-inner fade-section">
+      <div class="cover-stamp">✦ ✦ ✦</div>
+      <h1 class="cover-title">
+        <span class="title-line">Neha</span>
+        <em class="title-sub">Saravanan‑Khan</em>
+      </h1>
+      <p class="cover-tagline">a little book of us 🌸</p>
+      <div class="cover-divider"></div>
+      <p class="cover-date">made with all my love</p>
+      <div class="scroll-hint">
+        <span>scroll to open</span>
+        <div class="scroll-arrow">↓</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MEMORY 1 ══ -->
+  <!--
+  ┌─────────────────────────────────────────────────────────┐
+  │  HOW TO ADD A PHOTO                                     │
+  │  Replace the src="..." with either:                     │
+  │    • A direct image URL  (https://...)                  │
+  │    • A base64 string     (data:image/jpeg;base64,...)   │
+  │  The image will auto-fill the polaroid square.          │
+  └─────────────────────────────────────────────────────────┘
+  -->
+  <section class="page memory-page" id="page-1" data-page="1">
+    <div class="page-tape tape-tl"></div>
+    <div class="memory-inner">
+      <div class="memory-photo-wrap slide-from-left">
+        <div class="polaroid tilt-right">
+          <img src="images/pic1.png" alt="Memory 1"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 300%22%3E%3Crect width=%22300%22 height=%22300%22 fill=%22%23f5e6d8%22/%3E%3Ctext x=%22150%22 y=%22135%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-size=%2218%22 fill=%22%23a07868%22%3Eadd photo here%3C/text%3E%3Ctext x=%22150%22 y=%22165%22 text-anchor=%22middle%22 font-size=%2230%22%3E🌸%3C/text%3E%3C/svg%3E'" />
+          <div class="polaroid-caption">jab we met♡</div>
+        </div>
+        <div class="polaroid-sticker">🌸</div>
+      </div>
+      <div class="memory-text slide-from-right">
+        <span class="memory-number">01</span>
+        <h2 class="memory-title">The Beginning</h2>
+        <p class="memory-story">
+          I still remember the first time you txted me, the unhinged line of using our teacher's head as basketballs, moving on to us finding similarities and how we are, which lead to me asking you your blood group lol. I still remember it all like it was yesterday, to find myself being able to celebrate your birthday thrice, it is quite the experience. I wish to celebrate all your birthdays with you. FOREVER.🌸🌸
+        </p>
+        <div class="memory-date">📍 10th of May</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MEMORY 2 ══ -->
+  <section class="page memory-page alt-bg" id="page-2" data-page="2">
+    <div class="page-tape tape-tr"></div>
+    <div class="memory-inner reverse">
+      <div class="memory-text slide-from-left">
+        <span class="memory-number">02</span>
+        <h2 class="memory-title">Something Sweet</h2>
+        <p class="memory-story">
+         I still remember the day you first told me that you love me so much, you always liked saying that, my bubu jaan, you still do. And I'll never get tired of it. I hope i will get to hear all my life that you love me so so sooooo mucha and that you love me the most, meri pyari Neha Khan. God, you made me blush so damn much when you said it for the first time smh, fuck off smh.
+        </p>
+        <div class="memory-date">📍 26th june,2024 at 9:54 pm </div>
+      </div>
+      <div class="memory-photo-wrap slide-from-right">
+        <div class="polaroid tilt-left">
+          <img src="images/pic2.png" alt="Memory 2"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 300%22%3E%3Crect width=%22300%22 height=%22300%22 fill=%22%23f5e6d8%22/%3E%3Ctext x=%22150%22 y=%22135%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-size=%2218%22 fill=%22%23a07868%22%3Eadd photo here%3C/text%3E%3Ctext x=%22150%22 y=%22165%22 text-anchor=%22middle%22 font-size=%2230%22%3E✨%3C/text%3E%3C/svg%3E'" />
+          <div class="polaroid-caption">I love You The Most, Meri Jaan♡</div>
+        </div>
+        <div class="polaroid-sticker sticker-right">✨</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MEMORY 3 ══ -->
+  <section class="page memory-page" id="page-3" data-page="3">
+    <div class="page-tape tape-bl"></div>
+    <div class="memory-inner">
+      <div class="memory-photo-wrap slide-from-left">
+        <div class="polaroid tilt-right">
+          <img src="images/pic3.png" alt="Memory 3"
+               onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 300%22%3E%3Crect width=%22300%22 height=%22300%22 fill=%22%23f5e6d8%22/%3E%3Ctext x=%22150%22 y=%22135%22 text-anchor=%22middle%22 font-family=%22Georgia%22 font-size=%2218%22 fill=%22%23a07868%22%3Eadd photo here%3C/text%3E%3Ctext x=%22150%22 y=%22165%22 text-anchor=%22middle%22 font-size=%2230%22%3E🌷%3C/text%3E%3C/svg%3E'" />
+          <div class="polaroid-caption">Cuddling with you♡</div>
+        </div>
+        <div class="polaroid-sticker">🌷</div>
+      </div>
+      <div class="memory-text slide-from-right">
+        <span class="memory-number">03</span>
+        <h2 class="memory-title">My Favourite Time with you</h2>
+        <p class="memory-story">
+          I ABSOLUTELY LOVE CUDDLING WITH YOU, MERI JAAN. Gawd, i always hope that i can come back home to you and beeline straight towards you and just cuddle with you, all day, every day and I can't wait to marry you and come back home to you and cuddle you until bed time and then sleep with you in my arms.
+        </p>
+        <div class="memory-date">📍 7th June, 2026</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ LETTER ══ -->
+  <section class="page letter-page" id="page-letter" data-page="4">
+    <div class="letter-envelope slide-from-bottom">
+      <div class="envelope-flap"></div>
+      <div class="letter-inner">
+        <div class="letter-seal">🌸</div>
+        <h2 class="letter-title">Aapkay liyay, Hamesha, Meri Jaan</h2>
+        <div class="letter-rule"></div>
+        <p class="letter-body">
+          Meri pyari Neha Khan,<br /><br />
+          Spending time with you is just absolutely amazing, i always feel good and happy and i hope meri bubu jaan feels the same way with me, i hope I make you feel as much loved and cared for as you make me, and I hope I can hold you as tight as you have held me in the moments where I have felt the weakest.<br /><br />
+          Every page of this is for you. Every memory, every photo, every silly caption, ALL OF IT is just me trying to say that I'm really, really glad you're mine and that i get to be yours, i absolutely love being posessive over you and telling that you belong to me and with me, and I absolutely love it when you do the same. I wish to spend all my life telling you that and having the luxury of being able to be posessive over someone as amazing as you. Mwah.<br /><br />
+          With all the love there is in the world,<br />
+		  Sirf aur sirf aapka,<br />
+          <em>Abdul Rehman ♡</em>
+        </p>
+      </div>
+    </div>
+    <div class="final-petals" id="final-petals"></div>
+  </section>
+
+</div><!-- /scrapbook -->
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   ✏️  EDIT THIS SECTION — all your customisations go here
+════════════════════════════════════════════════════════════ */
+
+const SECRET_PIN = "120607";   // ← your passcode
+
+/*
+  SONGS — paste a direct URL (Dropbox/Google Drive direct link, etc.)
+  OR a base64 audio string: "data:audio/mpeg;base64,..."
+
+  To get a direct Dropbox link: share the file → copy link →
+  change "?dl=0" to "?raw=1" at the end.
+
+  To get a direct Google Drive link:
+  Share link looks like: https://drive.google.com/file/d/FILE_ID/view
+  Direct link:           https://drive.google.com/uc?export=download&id=FILE_ID
+
+  Leave the array empty ([]) to hide the music player entirely.
+*/
+const SONGS = [
+  { url: "music/track1.mp3",  title: "Night We Met"   },
+  { url: "music/track2.mp3",  title: "I Wanna Be Yours"   },
+  { url: "music/track3.mp3",  title: "Heart to Heart" },
+  { url: "music/track4.mp3",  title: "Something About You" },
+  { url: "music/track5.mp3",  title: "After Hours" },
+];
+
+/*
+  PHOTOS — in each memory section in the HTML above, set src="" to either:
+    • A direct image URL:         src="https://..."
+    • A Google Photos share link: src="https://photos.google.com/..."
+    • A base64 image:             src="data:image/jpeg;base64,..."
+
+  The easiest method:
+  1. Upload your photo to https://imgur.com (no account needed)
+  2. Right-click the image → "Copy image address"
+  3. Paste it as the src value
+*/
+
+/* ════════════════════════════════════════════════════════════
+   ⚙️  ENGINE — no need to edit below
+════════════════════════════════════════════════════════════ */
+
+// ── Build dots dynamically from PIN length ──
+const PIN_LEN    = SECRET_PIN.length;
+const dotsWrap   = document.getElementById('code-dots');
+for (let i = 0; i < PIN_LEN; i++) {
+  const s = document.createElement('span');
+  dotsWrap.appendChild(s);
+}
+const dots = dotsWrap.querySelectorAll('span');
+
+// ── Hide music controls (not the player) if no songs ──
+const validSongs = SONGS.filter(s => s.url && s.url.trim() !== '');
+if (!validSongs.length) {
+  document.querySelector('.music-controls').style.display = 'none';
+  document.getElementById('song-name').textContent = 'add songs ♪';
+  document.getElementById('music-hint').textContent = 'no tracks loaded yet';
+}
+
+// ── Lock screen floating particles ──
+(function() {
+  const canvas = document.getElementById('lock-canvas');
+  const ctx    = canvas.getContext('2d');
+  const emojis = ['🌸','✦','🌷','✿','❀'];
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 22; i++) {
+    particles.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      e: emojis[Math.floor(Math.random() * emojis.length)],
+      s: 10 + Math.random() * 14,
+      vy: 0.3 + Math.random() * 0.6,
+      vx: (Math.random() - 0.5) * 0.4,
+      a: 0.3 + Math.random() * 0.5,
+      rot: Math.random() * 360,
+      vr: (Math.random() - 0.5) * 0.8
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.a;
+      ctx.font = p.s + 'px serif';
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI / 180);
+      ctx.fillText(p.e, 0, 0);
+      ctx.restore();
+      p.y += p.vy; p.x += p.vx; p.rot += p.vr;
+      if (p.y > H + 30) { p.y = -30; p.x = Math.random() * W; }
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── Passcode logic ──
+let entered  = '';
+const lockEl = document.getElementById('lock-screen');
+const bookEl = document.getElementById('scrapbook');
+const hintEl = document.getElementById('lock-hint');
+
+function renderDots() {
+  dots.forEach((d, i) => {
+    d.classList.toggle('filled', i < entered.length);
+    d.classList.remove('error');
+  });
+}
+
+function flashError(msg) {
+  dots.forEach(d => { d.classList.remove('filled'); d.classList.add('error'); });
+  hintEl.textContent = msg;
+  setTimeout(() => { entered = ''; renderDots(); hintEl.textContent = ''; }, 750);
+}
+
+function tryUnlock() {
+  if (entered === SECRET_PIN) {
+    // confetti burst
+    const cw = document.getElementById('confetti-wrap');
+    const colors = ['#c23558','#962645','#1a2d52','#2c4270','#f5d0da','#b89a6a'];
+    for (let i = 0; i < 60; i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      p.style.cssText = `
+        left:${Math.random()*100}vw;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;
+        border-radius:${Math.random()>0.5?'50%':'2px'};
+        animation-duration:${1.2+Math.random()*1.2}s;
+        animation-delay:${Math.random()*0.4}s;
+      `;
+      cw.appendChild(p);
+    }
+    setTimeout(() => {
+      lockEl.classList.add('fade-out');
+      setTimeout(() => {
+        lockEl.style.display = 'none';
+        bookEl.classList.remove('hidden');
+        initScrapbook();
+      }, 900);
+    }, 300);
+  } else {
+    flashError('Wrong code — try again 💔');
+  }
+}
+
+document.querySelectorAll('.num').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const v = btn.dataset.n;
+    if (v === 'clear') {
+      entered = entered.slice(0, -1);
+      renderDots();
+      hintEl.textContent = '';
+    } else if (v === 'enter') {
+      if (entered.length < PIN_LEN) { flashError('Keep going... 🌸'); return; }
+      tryUnlock();
+    } else {
+      if (entered.length < PIN_LEN) {
+        entered += v;
+        renderDots();
+        if (entered.length === PIN_LEN) {
+          setTimeout(tryUnlock, 200);
+        }
+      }
+    }
+  });
+});
+
+// Keyboard support for passcode
+document.addEventListener('keydown', e => {
+  if (lockEl.classList.contains('fade-out') || lockEl.style.display === 'none') return;
+  if (e.key >= '0' && e.key <= '9') {
+    document.querySelector(`.num[data-n="${e.key}"]`)?.click();
+  } else if (e.key === 'Backspace') {
+    entered = entered.slice(0, -1);
+    renderDots();
+  } else if (e.key === 'Enter') {
+    if (entered.length === PIN_LEN) tryUnlock();
+  }
+});
+
+// ── Scrapbook init ──
+function initScrapbook() {
+  initScrollObserver();
+  initRibbon();
+  initCoverCanvas();
+  initFinalPetals();
+  // Always wire the toggle button
+  const toggleBtn = document.getElementById('music-toggle-btn');
+  const player    = document.getElementById('music-player');
+  toggleBtn.addEventListener('click', () => {
+    player.classList.toggle('collapsed');
+    toggleBtn.title = player.classList.contains('collapsed') ? 'Show player' : 'Hide player';
+  });
+  if (validSongs.length) initMusic();
+}
+
+// ── Scroll observer — fade & slide animations ──
+function initScrollObserver() {
+  const els = document.querySelectorAll('.fade-section,.slide-from-left,.slide-from-right,.slide-from-bottom');
+  const io  = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.12 });
+  els.forEach(el => io.observe(el));
+}
+
+// ── Progress ribbon ──
+function initRibbon() {
+  const pages  = document.querySelectorAll('.page');
+  const rdWrap = document.getElementById('ribbon-dots');
+  const rfill  = document.getElementById('ribbon-fill');
+
+  pages.forEach((pg, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'rdot';
+    dot.title = pg.dataset.page;
+    dot.addEventListener('click', () => pg.scrollIntoView({ behavior: 'smooth' }));
+    rdWrap.appendChild(dot);
+  });
+
+  const rdots = rdWrap.querySelectorAll('.rdot');
+
+  const scrollIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const idx = parseInt(e.target.dataset.page);
+        rdots.forEach((d, i) => d.classList.toggle('active', i === idx));
+      }
+    });
+  }, { threshold: 0.5 });
+
+  pages.forEach(pg => scrollIO.observe(pg));
+
+  window.addEventListener('scroll', () => {
+    const pct = window.scrollY / (document.body.offsetHeight - window.innerHeight) * 100;
+    rfill.style.height = Math.min(100, pct) + '%';
+  }, { passive: true });
+}
+
+// ── Cover parallax canvas ──
+function initCoverCanvas() {
+  const canvas = document.getElementById('cover-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const emojis = ['🌸','✿','❀','🌷','✦','·'];
+  let particles = [];
+
+  function resize() {
+    canvas.width  = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  for (let i = 0; i < 28; i++) {
+    particles.push({
+      x: Math.random(), y: Math.random() * 1.2 - 0.1,
+      e: emojis[Math.floor(Math.random() * emojis.length)],
+      s: 10 + Math.random() * 18,
+      a: 0.12 + Math.random() * 0.3,
+      d: 0.15 + Math.random() * 0.7
+    });
+  }
+
+  let scrollY = 0;
+  window.addEventListener('scroll', () => { scrollY = window.scrollY; }, { passive: true });
+
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      const py = ((p.y * H) - scrollY * p.d * 0.4 + H * 1.2) % (H * 1.2);
+      ctx.save();
+      ctx.globalAlpha = p.a;
+      ctx.font = p.s + 'px serif';
+      ctx.fillText(p.e, p.x * W, py);
+      ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+// ── Final petal shower (triggers when letter page is in view) ──
+function initFinalPetals() {
+  const container = document.getElementById('final-petals');
+  if (!container) return;
+  const emojis = ['🌸','🌷','✿','❀','🌺'];
+  let spawned = false;
+
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !spawned) {
+        spawned = true;
+        for (let i = 0; i < 20; i++) {
+          const p = document.createElement('span');
+          p.className = 'fpetal';
+          p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          p.style.cssText = `
+            left:${Math.random()*100}%;
+            animation-duration:${5+Math.random()*7}s;
+            animation-delay:${Math.random()*4}s;
+            font-size:${1+Math.random()*1.2}rem;
+          `;
+          container.appendChild(p);
+        }
+      }
+    });
+  }, { threshold: 0.3 });
+
+  const letterPage = document.getElementById('page-letter');
+  if (letterPage) io.observe(letterPage);
+}
+
+// ── Music player ──
+function initMusic() {
+  const audio    = document.getElementById('audio-player');
+  const playBtn  = document.getElementById('play-btn');
+  const prevBtn  = document.getElementById('prev-btn');
+  const nextBtn  = document.getElementById('next-btn');
+  const vinyl    = document.getElementById('music-vinyl');
+  const songName = document.getElementById('song-name');
+  const hint     = document.getElementById('music-hint');
+
+  let current   = 0;
+  let playing   = false;
+
+  function updateHint() {
+    hint.textContent = playing ? 'space to pause ♪' : 'space to play ♪';
+  }
+
+  function loadTrack(idx, andPlay) {
+    current = (idx + validSongs.length) % validSongs.length;
+    const t = validSongs[current];
+    audio.src      = t.url;
+    songName.textContent = t.title;
+    if (andPlay) play();
+    else updateHint();
+  }
+
+  function play() {
+    audio.play().then(() => {
+      playing = true;
+      playBtn.innerHTML = '&#10074;&#10074;';
+      vinyl.classList.add('spinning');
+      updateHint();
+    }).catch(err => {
+      console.warn('Autoplay blocked:', err);
+      hint.textContent = 'tap ▶ to start ♪';
+    });
+  }
+
+  function pause() {
+    audio.pause();
+    playing = false;
+    playBtn.innerHTML = '&#9654;';
+    vinyl.classList.remove('spinning');
+    updateHint();
+  }
+
+  function toggle() {
+    if (audio.src && audio.src !== window.location.href) {
+      playing ? pause() : play();
+    } else {
+      loadTrack(0, true);
+    }
+  }
+
+  playBtn.addEventListener('click', toggle);
+  prevBtn.addEventListener('click', () => loadTrack(current - 1, playing));
+  nextBtn.addEventListener('click', () => loadTrack(current + 1, playing));
+
+  audio.addEventListener('ended', () => loadTrack(current + 1, true));
+  audio.addEventListener('error', () => {
+    hint.textContent = 'could not load song :(';
+    playing = false;
+    playBtn.innerHTML = '&#9654;';
+    vinyl.classList.remove('spinning');
+  });
+
+  // Spacebar toggle
+  document.addEventListener('keydown', e => {
+    if (e.code === 'Space' && e.target === document.body) {
+      e.preventDefault();
+      toggle();
+    }
+  });
+
+  // Load first track (don't autoplay — browsers block it)
+  loadTrack(0, false);
+}
+</script>
+
+</body>
+</html>
